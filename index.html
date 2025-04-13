@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Customer Support Chatbot</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      color: #333;
+      margin-top: 16px;
+      font-size: 20px; /* Reduced font size */
+    }
+
+    .chat-container {
+      background: #ffffff;
+      width: 90%;
+      max-width: 400px; /* Reduced max width */
+      margin: 8px auto;
+      padding: 8px;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-image {
+      text-align: center;
+      padding: 4px 0;
+    }
+
+    .chat-image img {
+      max-width: 120px; /* Smaller image */
+      border-radius: 10px;
+    }
+
+    .chat-box {
+      height: 250px; /* Smaller height */
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 8px;
+      border-radius: 8px;
+      background: #fafafa;
+      font-size: 14px; /* Smaller font */
+    }
+
+    .user-msg, .bot-msg {
+      margin: 4px 0;
+    }
+
+    .user-msg {
+      text-align: right;
+      color: #0a84ff;
+    }
+
+    .bot-msg {
+      text-align: left;
+      color: #333;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 6px 12px;
+      background-color: #0a84ff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #006fd6;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Customer Support Chatbot</h1>
+
+  <div class="chat-container">
+    <!-- 👇 Chatbot Image -->
+    <div class="chat-image">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="Chatbot Icon" />
+    </div>
+
+    <!-- 👇 Chat Area -->
+    <div class="chat-box" id="chat-box"></div>
+
+    <!-- 👇 Input Area -->
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type your message here..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    function sendMessage() {
+      const userInput = document.getElementById("user-input");
+      const chatBox = document.getElementById("chat-box");
+
+      const msg = userInput.value.trim();
+      if (msg === "") return;
+
+      chatBox.innerHTML += `<div class="user-msg"><strong>You:</strong> ${msg}</div>`;
+      userInput.value = "";
+
+      fetch("/get", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "msg=" + encodeURIComponent(msg)
+      })
+        .then(res => res.json())
+        .then(data => {
+          chatBox.innerHTML += `<div class="bot-msg"><strong>Bot:</strong> ${data.response}</div>`;
+          chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    }
+
+    document.getElementById("user-input").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
